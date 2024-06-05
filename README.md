@@ -51,7 +51,7 @@ After exhausting herself in an IRC chatroom, Samantha falls into a surrealist dr
   - A simple declaration of Samantha's identity and self-awareness upon waking.
   - Samantha's soul blueprint is stored as a soulMemory, and system prompt at the start of `initialProcess` until it is transmuted by `soulSheds`.
 
-### Sample of Soul
+### Sample of Dream
 
 <img src="./dream-dozing.png" alt="An AI soul waking up from a surrealist dream" width="700">
 
