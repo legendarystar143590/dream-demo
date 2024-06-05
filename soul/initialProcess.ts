@@ -39,7 +39,7 @@ const verbalizes: MentalProcess = async ({ workingMemory: memory }) => {
 
   // Past the first invocation, Samantha starts to get sleepy
 
-  if (sleepCounter.current < 2) {
+  if (sleepCounter.current < 6) {
     sleepCounter.current += 1;
     log("Sleep counter:", sleepCounter.current)
 
