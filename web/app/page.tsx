@@ -112,18 +112,6 @@ export default function Page() {
 
   async function convertTextToSpeech(text: string, voiceId: string): Promise<string> {
     try {
-      console.log('Sending request to /api/convertTextToSpeech with body:', {
-        text: text,
-        voiceId: voiceId,
-        model_id: process.env.NEXT_PUBLIC_ELEVEN_LABS_MODEL_ID,
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.8,
-          style: 0.0,
-          use_speaker_boost: true
-        },
-      });
-
       const response = await fetch('/api/convertTextToSpeech/route', {
         method: 'POST',
         headers: {
@@ -141,20 +129,19 @@ export default function Page() {
           },
         }),
       });
-
+  
       if (!response.ok) {
         const errorBody = await response.text();
         console.error(`API Error: ${response.status} - ${errorBody}`);
         throw new Error(`Failed to convert text to speech: ${errorBody}`);
       }
-
+  
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
-      console.log('Audio URL:', audioUrl);
-      return audioUrl; // Return the audio URL
+      return audioUrl;
     } catch (error) {
       console.error('Client Error:', error);
-      throw error; // Rethrow the error to handle it in the calling function
+      throw error;
     }
   }
 

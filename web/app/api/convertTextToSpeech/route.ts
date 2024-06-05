@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
+  console.log('Received POST request at /api/convertTextToSpeech/route');
   const { text, voiceId, model_id, voice_settings } = await request.json();
 
   console.log('Request Body:', { text, voiceId, model_id, voice_settings });

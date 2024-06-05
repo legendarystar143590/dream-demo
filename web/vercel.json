@@ -2,8 +2,8 @@
   "version": 2,
   "functions": {
     "app/api/convertTextToSpeech/route.ts": {
-      "memory": 1024,
-      "maxDuration": 10
+      "memory": 2048,
+      "maxDuration": 30
     }
   }
 }
