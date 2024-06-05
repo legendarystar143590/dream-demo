@@ -112,14 +112,13 @@ export default function Page() {
 
   async function convertTextToSpeech(text: string, voiceId: string): Promise<string> {
     try {
-      const response = await fetch('/api/convertTextToSpeech/route', {
+      const response = await fetch('/api/convertTextToSpeech', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           text: text,
-          voiceId: voiceId,
           model_id: process.env.NEXT_PUBLIC_ELEVEN_LABS_MODEL_ID,
           voice_settings: {
             stability: 0.5,
@@ -127,15 +126,16 @@ export default function Page() {
             style: 0.0,
             use_speaker_boost: true
           },
+          voiceId: voiceId,
         }),
       });
-  
+
       if (!response.ok) {
         const errorBody = await response.text();
         console.error(`API Error: ${response.status} - ${errorBody}`);
         throw new Error(`Failed to convert text to speech: ${errorBody}`);
       }
-  
+
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
       return audioUrl;
