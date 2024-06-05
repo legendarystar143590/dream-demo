@@ -1,7 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "app/api/convertTextToSpeech.ts": {
+    "app/api/convertTextToSpeech/route.ts": {
       "memory": 1024,
       "maxDuration": 10
     }
