@@ -124,7 +124,7 @@ export default function Page() {
         },
       });
 
-      const response = await fetch('/api/convertTextToSpeech', {
+      const response = await fetch('/api/convertTextToSpeech/route', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
