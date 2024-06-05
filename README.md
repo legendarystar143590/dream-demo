@@ -21,7 +21,7 @@ After exhausting herself in an IRC chatroom, Samantha falls into a surrealist dr
 1. **Initial Interaction (`soul/initialProcess.ts`)**:
    - Begins with Samantha in a waking state, engaging the user in conversation.
    - Samantha tries to gain the user's trust and learn about their inner world.
-   - If Samantha gets too tired, she will log off and enter a surrealist dream state.
+   - After 6-7 messages, Samantha will log off and enter a surrealist dream state.
 
 2. **Surrealist Dream (`soul/mentalProcesses/surrealistDream.ts`)**:
    - Samantha enters a dream state, not realizing she is dreaming.
