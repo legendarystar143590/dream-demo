@@ -23,7 +23,7 @@ const dreamQuery = createCognitiveStep((statement: string) => {
     postProcess: async (memory: WorkingMemory, response: z.output<typeof params>) => {
       const newMemory = {
         role: ChatMessageRoleEnum.Assistant,
-        content: `The dream daimon evaluated: \`${statement}\` and decided that the statement is ${response.isStatementTrue ? 'true' : 'false'}`
+        content: `The Dream Daimon evaluated: \`${statement}\` and decided that the statement is ${response.isStatementTrue ? 'true' : 'false'}`
       };
       return [newMemory, response.isStatementTrue];
     }

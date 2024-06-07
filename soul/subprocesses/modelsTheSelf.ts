@@ -16,7 +16,7 @@ const userNotes = createCognitiveStep(() => {
       
             ## Rules
             * Keep descriptions as bullet points
-            * Keep relevant bullet points from before
+            * Sum up past bullets into one or two
             * Analyze ${name}'s perceived emotional state
             * Use abbreviated language to keep the notes short
             * DO NOT write notes about the user

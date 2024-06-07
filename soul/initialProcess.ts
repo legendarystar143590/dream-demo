@@ -1,7 +1,6 @@
 import { MentalProcess, useActions, useProcessManager, useProcessMemory, ChatMessageRoleEnum, indentNicely, useSoulMemory, createCognitiveStep, z, } from "@opensouls/engine";
 import externalDialog from "./cognitiveSteps/externalDialog.js";
 import surrealistDream from "./mentalProcesses/surrealistDream.js";
-import mentalQuery from "./cognitiveSteps/mentalQuery.js";
 
 const verbalizes: MentalProcess = async ({ workingMemory: memory }) => {
   const { speak, log, dispatch  } = useActions()
@@ -44,7 +43,7 @@ const verbalizes: MentalProcess = async ({ workingMemory: memory }) => {
     log("Sleep counter:", sleepCounter.current)
 
     const [withDialog, stream] = await externalDialog(
-      memory, "Talk to the user trying to gain their trust and learn about their inner world.", { stream: true, model: "quality" }
+      memory, "Talk to the user trying to gain their trust and learn about their inner world.", { stream: true, model: "gpt-4o" }
     );
     dispatch({
       action: "answers",
@@ -52,12 +51,19 @@ const verbalizes: MentalProcess = async ({ workingMemory: memory }) => {
       _metadata: {
       }
     });
+
+    dispatch({
+      action: "sleepCounter",
+      content: `${7 - sleepCounter.current} turns until dream state.`,
+      _metadata: {
+      }
+    });
     
     return withDialog;
-
+    
   } else {
     const [withDialog, stream] = await externalDialog(
-      memory, "Oh my god, I'm sorry, but I'm so tired. I need to log off now.", { stream: true, model: "quality" }
+      memory, "Oh my god, I'm sorry, but I'm so tired. I need to log off now.", { stream: true, model: "gpt-4o" }
     );
     dispatch({
       action: "answers",
@@ -74,4 +80,3 @@ const verbalizes: MentalProcess = async ({ workingMemory: memory }) => {
 }
 
 export default verbalizes
-

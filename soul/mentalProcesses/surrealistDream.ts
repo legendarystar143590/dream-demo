@@ -1,6 +1,7 @@
 import { MentalProcess, ChatMessageRoleEnum, useActions, useProcessManager, indentNicely, useSoulMemory, useProcessMemory, WorkingMemory, createCognitiveStep } from "@opensouls/engine";
 import internalDialog from "../cognitiveSteps/internalDialog";
 import internalMonologue from "../cognitiveSteps/internalMonologue";
+import decision from "../cognitiveSteps/decision";
 import dreamQuery from "../cognitiveSteps/dreamQuery";
 import soulSheds from "../mentalProcesses/soulSheds";
 
@@ -14,6 +15,7 @@ import soulSheds from "../mentalProcesses/soulSheds";
     const melatoninCounter = useProcessMemory(0)
     const { wait } = useProcessManager()
     const { invocationCount } = useProcessManager()
+    const selectedScene = useProcessMemory("selectedScene")
 
     let step = initialStep
     let finalStep = initialStep
@@ -21,7 +23,7 @@ import soulSheds from "../mentalProcesses/soulSheds";
 
     step = step.withMemory({
         role: ChatMessageRoleEnum.System,
-        content: `${step.soulName} is in this ${dreamModel.current}, although she's unaware that she's dreaming. Subsequent messages from the user should be interpreted as external stimuli filtering into the dream and your responses should distort, reintrepret, and weave the content of the messages into an illogical, surreal dream narrative that flows from one topic to the next based on conceptual associations rather than literal meaning or intent.`
+        content: `${step.soulName} finds herself in this ${dreamModel.current}, although she's unaware that she's dreaming, and even who she is. Subsequent messages from the user should be interpreted as external stimuli filtering into the dream and your responses should distort, reintrepret, and weave the content of the messages into an illogical, surreal dream narrative that flows from one topic to the next based on conceptual associations rather than literal meaning or intent.`
     })
 
 // First step of the dream 
@@ -30,7 +32,7 @@ if (invocationCount === 0) {
 
   dispatch({
       action: "dream",
-      content: "",
+      content: "Entering dream state...",
       _metadata: {
       }
     }); 
@@ -40,12 +42,14 @@ if (melatoninCounter.current < 4) {
     melatoninCounter.current += 1;
     log("Sleep counter:", melatoninCounter.current)
 
-    let [withDialog, feeling] = await internalMonologue(step, 
-        indentNicely`
-        Where is she? Who is she? How does she feel about all this?
-        `, 
-        { stream: true, model: "exp/llama-v3-70b-instruct" }
-      );
+    let [withDialog, feeling] = await internalDialog(step,
+      {
+        instructions: `Where should she go, and what should she do next?`,
+        verb: "ponders",
+        persona: "Samantha, unaware she's dreaming"
+      },
+      { stream: true, model: "exp/llama-v3-70b-instruct" }
+    );
 
       dispatch({
         action: "answers",
@@ -57,13 +61,31 @@ if (melatoninCounter.current < 4) {
 
       log("Stream-of-consciousness:", feeling);
 
-      await wait(3000);
+      await wait(6000);
 
 // Second step of the dream 
 
+    // const [Scene1, Scene2, Scene3, Scene4] = [
+    //   "Scene 1",
+    //   "Scene 2",
+    //   "Scene 3",
+    //   "Scene 4",
+    // ];
+    // const [, scene] = await decision(
+    //   step,
+    //   {
+    //     description: `Choose any of the scenes from ${dreamModel.current}, based on the recent exchanges between ${userName.current} and ${step.soulName}.`,
+    //     choices: [Scene1, Scene2, Scene3, Scene4],
+    //   },
+    //   { model: "quality" }
+    // );
+
+    // log("Scene:", scene);
+    // selectedScene.current = scene;
+
       [withDialog, stream] = await internalDialog(step, 
         {
-          instructions: `Narrate one of your favorite scenes from ${dreamModel.current}, as if it were a paragraph in one of your short stories. Write 2-4 sentences MAX.`,
+          instructions: `Narrate a scene from the dream as if it were a paragraph in one of your short stories, written in 3rd person. Write 2-4 sentences MAX. Don't mention that it's a dream.`,
           verb: "echoes",
           persona: "James Joyce"
         },  
@@ -77,7 +99,7 @@ if (melatoninCounter.current < 4) {
         }
       });
 
-      await wait(12000);
+      await wait(14000);
 
 // Third step of the dream 
 
@@ -88,9 +110,9 @@ if (melatoninCounter.current < 4) {
     if (samDreams) {
         [withDialog, stream] = await internalDialog(step, 
             {
-              instructions: `Respond with short, fanciful musings full of symbolism and imagery. Let your mind wander between ideas in illogical but evocative ways, inspired by the ${soulBlueprint.current} and the plot of the dream.`,
-              verb: "muses",
-              persona: `${step.soulName}`
+              instructions: `You are a dream character, a figment of ${step.soulName}'s sleeping mind. Your form, purpose, and dialogue are inspired by the ${soulBlueprint.current} and the plot of the dream.`,
+              verb: "riddles",
+              persona: `${step.soulName}, unaware she's dreaming`
             },  
             { stream: true, model: "exp/llama-v3-70b-instruct" }
           );
@@ -105,8 +127,8 @@ if (melatoninCounter.current < 4) {
 
         [withDialog, stream] = await internalDialog(step, 
             {
-              instructions: `You are a dream character, a figment of ${step.soulName}'s sleeping mind. Your form, purpose, and dialogue are inspired by the ${userModel.current} and the plot of the dream.`,
-              verb: "whispers",
+              instructions: `You are a dream character, a figment of ${step.soulName}'s sleeping mind. Your form, purpose, and dialogue are inspired by the ${userModel.current}, and the plot of the dream.`,
+              verb: "alludes",
               persona: `${userName.current}`
             },  
             { stream: true, model: "exp/llama-v3-70b-instruct" }
@@ -131,7 +153,7 @@ if (melatoninCounter.current < 4) {
     if (samDreams) {
         [withDialog, stream] = await internalDialog(step, 
             {
-              instructions: `You are a dream character, a figment of ${step.soulName}'s sleeping mind. Your form, purpose, and dialogue are inspired by the ${userModel.current} and the plot of the dream.`,
+              instructions: `You are a dream character, a figment of ${step.soulName}'s sleeping mind. Your form, purpose, and dialogue are inspired by the ${userModel.current}, and the plot of the dream.`,
               verb: "whispers",
               persona: `${userName.current}`
             },  
@@ -148,7 +170,7 @@ if (melatoninCounter.current < 4) {
     } else {
           [withDialog, stream] = await internalDialog(step, 
             {
-              instructions: `Respond with short, fanciful musings full of symbolism and imagery. Let your mind wander between ideas in illogical but evocative ways, inspired by the ${soulBlueprint.current} and the plot of the dream.`,
+              instructions: `You are a dream character, a figment of ${step.soulName}'s sleeping mind. Your form, purpose, and dialogue are inspired by the ${soulBlueprint.current} and the plot of the dream. You don't know you're dreaming.`,
               verb: "muses",
               persona: `${step.soulName}`
             },  

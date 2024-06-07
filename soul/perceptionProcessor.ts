@@ -6,7 +6,7 @@ function safeName(name?: string) {
  
 const perceptionProcessor: PerceptionProcessor = async ({ perception, workingMemory, currentProcess }) => {
   const { log } = useActions()
-  const userName = useSoulMemory("userName", "")
+  const userName = useSoulMemory("userName", "Anon")
  
   const name = userName.current ? userName.current : perception.name
  

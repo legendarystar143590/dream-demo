@@ -1,5 +1,6 @@
 import { ChatMessageRoleEnum, MentalProcess, WorkingMemory, createCognitiveStep, indentNicely, useActions, useProcessManager, useSoulMemory } from "@opensouls/engine";
-import surrealistDream from "../mentalProcesses/surrealistDream";
+import dreamQuery from "../cognitiveSteps/dreamQuery";
+import internalDialog from "../cognitiveSteps/internalDialog";
 
 const dreamGenie = createCognitiveStep(({existingDream}: { existingDream?: string }) => {
   const userName = useSoulMemory("userName")
@@ -26,6 +27,7 @@ const dreamGenie = createCognitiveStep(({existingDream}: { existingDream?: strin
           
             ## Rules
             * Don't self-censor yourself.
+            * Use Markdown to format your response.
           `
         }
       },
@@ -42,14 +44,14 @@ const dreamGenie = createCognitiveStep(({existingDream}: { existingDream?: strin
   })
 
   const internalizesTheDream: MentalProcess = async ({ workingMemory: initialStep }) => {
-    const dreamModel = useSoulMemory("dreamModel", "Unknown dream");
+    const dreamModel = useSoulMemory("dreamModel", "");
     const dreamTime = useSoulMemory("dreamTime", 0);
     const { log } = useActions();
 
     let step = initialStep;
     let finalStep = initialStep;
-
-    if (dreamTime.current === 1) {
+    
+    if (dreamTime.current === 1)  {
 
       const [, alchemy] = await dreamGenie(
         step, 
@@ -64,9 +66,44 @@ const dreamGenie = createCognitiveStep(({existingDream}: { existingDream?: strin
       return finalStep;
     }
 
+  //   if (dreamTime.current === 1 && dreamModel.current)  {
+
+  //   const [, learnedSomethingNew] = await dreamQuery(
+  //     step,
+  //     `The user's messages have influenced ${step.soulName}'s dream in some way.`,
+  //     { model: "quality" }
+  //   )
+  //   log("Update dream?", learnedSomethingNew)
+  //   if (learnedSomethingNew) {
+  //     let dreamUpdate
+  //     [step, dreamUpdate] = await internalDialog(step,
+  //       {
+  //         instructions: `How has the plot of the dream been altered by the user's messages?`,
+  //         verb: "mused",
+  //         persona: "Daimon"
+  //       },
+  //       { model: "exp/nous-hermes-2-mixtral-fp8" }
+  //     )
+  //     log("Dream updates:", dreamUpdate)
+
+  //     const [, alchemy] = await dreamGenie(
+  //       step, 
+  //       {
+  //         existingDream: dreamModel.current
+  //       }, 
+  //       { model: "exp/nous-hermes-2-mixtral-fp8" }
+  //     );
+  //     dreamModel.current = alchemy;
+  //     log("Dream model:", dreamModel.current);
+
+  //     return finalStep;
+  //   }
+  // }
+
+  if (dreamTime.current === 0) {
     log("No dreams cuz Samantha's still awake!");
+  }
     return finalStep;
   }
 
   export default internalizesTheDream
-

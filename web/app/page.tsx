@@ -24,6 +24,10 @@ export type ChatMessage =
       content: string;
     };
 
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export default function Page() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isThinking, setIsThinking] = useState(false);
@@ -50,6 +54,25 @@ export default function Page() {
           const audioUrl = await convertTextToSpeech(fullMessage, process.env.NEXT_PUBLIC_ELEVEN_LABS_VOICE_ID_GENIE!);
           const audio = new Audio(audioUrl);
           audio.play();
+        } 
+        else if (type === 'sleepCounter') {
+          const audioUrl = await convertTextToSpeechForSleepCounter(fullMessage);
+          const audio = new Audio(audioUrl);
+          await delay(3000); // Delay by 3 seconds
+          audio.play();
+          return; // Skip adding the message to the state
+        }
+        else if (type === 'dream') {
+          const audioUrl = await convertTextToSpeechForSleepCounter(fullMessage);
+          const audio = new Audio(audioUrl);
+          audio.play();
+          return; // Skip adding the message to the state
+        }
+        else if (type === 'wakes') {
+          const audioUrl = await convertTextToSpeechForSleepCounter(fullMessage);
+          const audio = new Audio(audioUrl);
+          audio.play();
+          return; // Skip adding the message to the state
         }
         setMessages((prev) => [
           ...prev,
@@ -68,25 +91,43 @@ export default function Page() {
     onProcessStarted: () => {
       setIsThinking(true);
     },
-    onDream: () => { // Add handler for "dream" event
+    onDream: async () => { // Add handler for "dream" event
       setIsDarkMode(true); // Switch to dark mode
+      const messageContent = "Entering dream state...";
       setMessages((prev) => [
         ...prev,
         {
           type: "system",
-          content: "Entering dream state...",
+          content: messageContent,
         },
       ]);
+
+      try {
+        const audioUrl = await convertTextToSpeechForSleepCounter(messageContent);
+        const audio = new Audio(audioUrl);
+        audio.play();
+      } catch (error) {
+        console.error("Error playing dream state audio:", error);
+      }
     },
-    onWake: () => { // Add handler for "wakes" event
+    onWake: async () => { // Add handler for "wakes" event
       setIsDarkMode(false); // Switch to light mode
+      const messageContent = "Exiting dream state...";
       setMessages((prev) => [
         ...prev,
         {
           type: "system",
-          content: "Exiting dream state...",
+          content: messageContent,
         },
       ]);
+
+      try {
+        const audioUrl = await convertTextToSpeechForSleepCounter(messageContent);
+        const audio = new Audio(audioUrl);
+        audio.play();
+      } catch (error) {
+        console.error("Error playing wake state audio:", error);
+      }
     },
   });
 
@@ -127,6 +168,41 @@ export default function Page() {
             use_speaker_boost: true
           },
           voiceId: voiceId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error(`API Error: ${response.status} - ${errorBody}`);
+        throw new Error(`Failed to convert text to speech: ${errorBody}`);
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      return audioUrl;
+    } catch (error) {
+      console.error('Client Error:', error);
+      throw error;
+    }
+  }
+
+  async function convertTextToSpeechForSleepCounter(text: string): Promise<string> {
+    try {
+      const response = await fetch('/api/convertTextToSpeech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: text,
+          model_id: process.env.NEXT_PUBLIC_ELEVEN_LABS_MODEL_ID_COUNTER, // Use the specific model ID for sleepCounter
+          voice_settings: {
+            stability: 1.0,
+            similarity_boost: 1.0,
+            style: 0.0,
+            use_speaker_boost: true
+          },
+          voiceId: process.env.NEXT_PUBLIC_ELEVEN_LABS_VOICE_ID_COUNTER, // Use the specific voice ID for sleepCounter
         }),
       });
 
@@ -223,8 +299,8 @@ function useSoul({
 }: {
   onNewMessage: (stream: AsyncIterable<string>, type: string) => void;
   onProcessStarted: () => void;
-  onDream: () => void;
-  onWake: () => void;
+  onDream: () => Promise<void>; // Update the type to Promise<void>
+  onWake: () => Promise<void>; // Update the type to Promise<void>
 }) {
   const soulRef = useRef<Soul | undefined>(undefined);
 
@@ -255,12 +331,18 @@ function useSoul({
       onNewMessage(await stream(), 'conjures');
     });
 
-    soulInstance.on("dream", () => {
-      onDream();
+    soulInstance.on("sleepCounter", async ({ stream }) => {
+      onNewMessage(await stream(), 'sleepCounter');
     });
 
-    soulInstance.on("wakes", () => {
-      onWake();
+    soulInstance.on("dream", async ({ stream }) => {
+      await onDream(); // Await the onDream function
+      // Skip adding the message to the state
+    });
+
+    soulInstance.on("wakes", async ({ stream }) => {
+      await onWake(); // Await the onWake function
+      // Skip adding the message to the state
     });
 
     await soulInstance.connect();

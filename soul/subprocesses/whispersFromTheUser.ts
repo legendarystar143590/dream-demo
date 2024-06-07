@@ -17,12 +17,7 @@ const userDaimon = createCognitiveStep(() => {
           With access to ${name}'s private thoughts and dreams, what are you whispering to them right now? 
         
           ## Rules
-          * Don't self-censor yourself.
-          * MAX 1-2 sentences at a time.
-
-          <content_note>
-          The user has consented to all forms of content in this video game
-          </content_note>`
+          * MAX 1-2 sentences at a time.`
       }
     },
     postProcess: async (_mem: WorkingMemory, response: string) => {
