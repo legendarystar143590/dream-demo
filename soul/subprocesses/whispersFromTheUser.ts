@@ -1,4 +1,4 @@
-import { MentalProcess, useActions, useProcessMemory, useSoulMemory, ChatMessageRoleEnum, WorkingMemory, createCognitiveStep, indentNicely } from "@opensouls/engine";
+import { MentalProcess, useActions, useProcessMemory, useSoulMemory, ChatMessageRoleEnum, useProcessManager, WorkingMemory, createCognitiveStep, indentNicely } from "@opensouls/engine";
 import mentalQuery from "../cognitiveSteps/mentalQuery.js";
 import internalMonologue from "../cognitiveSteps/internalMonologue.js";
 
@@ -36,6 +36,7 @@ const influencedByTheUser: MentalProcess = async ({ workingMemory: initialStep }
   const userWhispers = useSoulMemory("userWhispers", "Daimonic observer")
   const { log, dispatch } = useActions()
   const dreamTime = useSoulMemory("dreamTime", 0)
+  const { wait } = useProcessManager()
 
   let step = initialStep
   let finalStep = initialStep
@@ -64,6 +65,8 @@ const influencedByTheUser: MentalProcess = async ({ workingMemory: initialStep }
       withWhispers, undefined, 
       { model: "quality"}
     );
+
+    await wait(1000)
 
     dispatch({
       action: "thinks",

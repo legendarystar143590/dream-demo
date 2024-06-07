@@ -46,12 +46,12 @@ const dreamGenie = createCognitiveStep(({existingDream}: { existingDream?: strin
   const internalizesTheDream: MentalProcess = async ({ workingMemory: initialStep }) => {
     const dreamModel = useSoulMemory("dreamModel", "");
     const dreamTime = useSoulMemory("dreamTime", 0);
-    const { log } = useActions();
+    const { log, dispatch } = useActions();
 
     let step = initialStep;
     let finalStep = initialStep;
     
-    if (dreamTime.current === 1)  {
+    if (dreamTime.current === 1 && !dreamModel.current)  {
 
       const [, alchemy] = await dreamGenie(
         step, 
@@ -62,6 +62,14 @@ const dreamGenie = createCognitiveStep(({existingDream}: { existingDream?: strin
       );
       dreamModel.current = alchemy;
       log("Dream model:", dreamModel.current);
+
+      dispatch({
+        action: "narrates",
+        content: dreamModel.current,
+        _metadata: {
+          // Add any relevant metadata here
+        }
+      });
 
       return finalStep;
     }

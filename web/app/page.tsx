@@ -58,7 +58,7 @@ export default function Page() {
         else if (type === 'sleepCounter') {
           const audioUrl = await convertTextToSpeechForSleepCounter(fullMessage);
           const audio = new Audio(audioUrl);
-          await delay(3000); // Delay by 3 seconds
+          await delay(3500); // Delay by 3.5 seconds
           audio.play();
           return; // Skip adding the message to the state
         }
@@ -71,6 +71,14 @@ export default function Page() {
         else if (type === 'wakes') {
           const audioUrl = await convertTextToSpeechForSleepCounter(fullMessage);
           const audio = new Audio(audioUrl);
+          audio.play();
+          return; // Skip adding the message to the state
+        }
+        else if (type === 'narrates') {
+          const sanitizedMessage = fullMessage.replace(/[\*#]/g, ''); // Remove all asterisks and hash symbols
+          const audioUrl = await convertTextToSpeech(sanitizedMessage, process.env.NEXT_PUBLIC_ELEVEN_LABS_VOICE_ID_NARRATE!);
+          const audio = new Audio(audioUrl);
+          audio.volume = 0.10; // Set volume to 10%
           audio.play();
           return; // Skip adding the message to the state
         }
@@ -333,6 +341,10 @@ function useSoul({
 
     soulInstance.on("sleepCounter", async ({ stream }) => {
       onNewMessage(await stream(), 'sleepCounter');
+    });
+
+    soulInstance.on("narrates", async ({ stream }) => {
+      onNewMessage(await stream(), 'narrates');
     });
 
     soulInstance.on("dream", async ({ stream }) => {

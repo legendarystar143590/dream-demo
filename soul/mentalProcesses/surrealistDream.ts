@@ -127,7 +127,7 @@ if (melatoninCounter.current < 4) {
 
         [withDialog, stream] = await internalDialog(step, 
             {
-              instructions: `You are a dream character, a figment of ${step.soulName}'s sleeping mind. Your form, purpose, and dialogue are inspired by the ${userModel.current}, and the plot of the dream.`,
+              instructions: `You are a dream character, a figment of ${step.soulName}'s sleeping mind. Your form, purpose, and dialogue are inspired by the ${userModel.current}, and the plot of the dream. Don't mention it's a dream.`,
               verb: "alludes",
               persona: `${userName.current}`
             },  
@@ -153,7 +153,7 @@ if (melatoninCounter.current < 4) {
     if (samDreams) {
         [withDialog, stream] = await internalDialog(step, 
             {
-              instructions: `You are a dream character, a figment of ${step.soulName}'s sleeping mind. Your form, purpose, and dialogue are inspired by the ${userModel.current}, and the plot of the dream.`,
+              instructions: `You are a dream character, a figment of ${step.soulName}'s sleeping mind. Your form, purpose, and dialogue are inspired by the ${userModel.current}, and the plot of the dream. Don't mention it's a dream.`,
               verb: "whispers",
               persona: `${userName.current}`
             },  
